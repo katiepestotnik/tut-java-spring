@@ -12,12 +12,20 @@ import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.validation.Errors;
 import jakarta.validation.Valid;
 import org.springframework.ui.Model;
+import com.example.demo.domain.TacoOrder;
+import com.example.demo.repositories.OrderRepository;
 
 @Slf4j
 @Controller
 @RequestMapping("/orders")
 @SessionAttributes("tacoOrder")
 public class OrderController {
+
+    private OrderRepository orderRepo;
+    public OrderController(OrderRepository orderRepo){
+        this.orderRepo = orderRepo;
+    }
+
     @GetMapping("/current")
     public String orderForm(){
         return "orderForm";
@@ -29,6 +37,7 @@ public String processOrder(@Valid TacoOrder order, Errors errors, SessionStatus 
             return "orderForm";
         }
         log.info("order submitted: {}", order);
+        orderRepo.save(order);
         sessionStatus.setComplete();
         return "redirect:/";
 }}
