@@ -3,6 +3,7 @@ package com.example.demo.controllers;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import com.example.demo.repositories.IngredientRepository;
 import jakarta.validation.constraints.Max;
@@ -39,7 +40,7 @@ public class DesignTacoController {
     @ModelAttribute
     public void addIngredientsToModel(Model model){
         //DATABASE with JdbcRepo and IngredientRepo
-        List<Ingredient> ingredients = ingredientRepo.findAll();
+        Iterable<Ingredient> ingredients = ingredientRepo.findAll();
 
         Type[] types = Ingredient.Type.values();
         for(Type type: types){
@@ -69,10 +70,15 @@ public class DesignTacoController {
         return "redirect:/orders/current";
     }
 
-    private Iterable<Ingredient> filterByType(List<Ingredient> ingredients, Type type){
-        return ingredients
-                .stream()
-                .filter(x ->x.getType().equals(type))
-                .collect(Collectors.toList());
-    }
+//    private Iterable<Ingredient> filterByType(Iterable<Ingredient> ingredients, Type type){
+//        return ingredients
+//                .stream()
+//                .filter(x ->x.getType().equals(type))
+//                .collect(Collectors.toList());
+//    }
+private Iterable<Ingredient> filterByType(Iterable<Ingredient> ingredients, Type type) {
+    return StreamSupport.stream(ingredients.spliterator(), false)
+            .filter(x -> x.getType().equals(type))
+            .toList();   // Java 17+ returns List
+}
 }
